@@ -46,7 +46,7 @@ Get the list of JIRA issues (JIRA needs to be integrated with Bamboo) associated
 
     bamboo-api jira_issue <plan> <build_no> [dependent_plan]
 
-  	If you work with build pipelines, you know that builds are triggered by other builds. So you might need to find out the JIRA issues associated to the commits done on the build triggering the considered "plan".
+If you work with build pipelines, you know that builds are triggered by other builds. So you might need to find out the JIRA issues associated to the commits done on the build triggering the considered "plan".
 
 Get the content of an artifact associated to a specific build of a plan:
 
