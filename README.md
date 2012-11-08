@@ -1,4 +1,4 @@
-bamboo-api
+bamboo-api [![Build Status](https://travis-ci.org/sebarmeli/bamboo-api.png)](https://travis-ci.org/sebarmeli/bamboo-api)
 ------
 
 Node.js module wrapping the [Atlassian Bamboo REST API](https://developer.atlassian.com/display/BAMBOODEV/Bamboo+REST+APIs) . This module gets some useful information from your [Atalassian Bamboo](http://www.atlassian.com/software/bamboo/overview) CI, such as latest successful build number for a plan or JIRA issues associated to a specific build.
@@ -7,6 +7,8 @@ It can be used as command-line interface or can be included in your Node app.
 
 Installation
 ------------
+    
+After getting Node.js and npm:
 
     npm install -g bamboo-api
 
@@ -65,3 +67,17 @@ Define the Bamboo URL in BAMBOO_URL environment variable (defaults to http://loc
 (Windows)
 
     set BAMBOO_URL=http://host:port
+
+
+Development
+------------
+
+This module contains only a limited set of information available with the Bamboo API. Feel free to extend it. Test cases are located in the 'test' folder and you run them either through:
+
+    npm test
+
+or
+
+    mocha
+
+    
