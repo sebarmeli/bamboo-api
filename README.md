@@ -1,4 +1,4 @@
-bamboo-api [![http://travis-ci.org/sebarmeli/bamboo-api](https://secure.travis-ci.org/sebarmeli/bamboo-api.png?branch=master)](http://travis-ci.org/sebarmeli/bamboo-api)
+bamboo-api
 ------
 
 Node.js module wrapping the [Atlassian Bamboo REST API](https://developer.atlassian.com/display/BAMBOODEV/Bamboo+REST+APIs) . This module gets some useful information from your [Atalassian Bamboo](http://www.atlassian.com/software/bamboo/overview) CI, such as latest successful build number for a plan or JIRA issues associated to a specific build.
