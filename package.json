@@ -1,0 +1,46 @@
+{
+  "name": "bamboo-api",
+  "version": "0.0.1",
+  "description": "Node wrapper around Atlassian Bamboo API",
+  "main": "./lib/bamboo.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "bin": {
+    "bamboo-api": "./bin/bamboo-api"
+  },
+  "dependencies": {
+    "request": "~2.11.4",
+    "underscore": "~1.4.2",
+    "commander": "~1.0.5"
+  },
+  "devDependencies": {
+    "mocha": "~1.3.2",
+    "should": "~1.2.1",
+    "nock": "0.13.5"
+  },
+  "directories": {
+    "bin": "./bin",
+    "lib": "./lib",
+    "test": "./test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sebarmeli/bamboo-api"
+  },
+  "keywords": [
+    "bamboo",
+    "rest-api",
+    "ci"
+  ],
+  "engine": {
+    "node": "~0.6.x"
+  },
+  "author": "Sebastiano Armeli-Battana <seba.armeli@gmail.com>",
+  "license": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/sebarmeli/bamboo-api/raw/master/LICENSE"
+    }
+  ]
+}

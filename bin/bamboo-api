@@ -1,0 +1,62 @@
+#!/usr/bin/env node
+
+var program = require('commander'),
+	Bamboo = require('../lib/bamboo');
+
+var bamboo_host = process.env.BAMBOO_URL,
+	bamboo = new Bamboo(bamboo_host);
+
+program
+   .version('0.0.1')
+
+program
+	.command('status <plan>')
+	.description('get the status of the latest build')
+	.action(function(plan){
+		return bamboo.getLatestBuilsStatus(plan, function(result) {
+			console.log(result);
+		}
+	);
+});
+
+program
+	.command('build_no <plan>')
+	.description('get the latest successful build number')
+	.action(function(plan){
+		return bamboo.getLatestSuccessfulBuilNumber(plan, "", function(result) {
+			console.log(result);
+		}
+	);
+});
+
+program
+	.command('artifact <plan> <build_no> <artifact_name>')
+	.description('gets the content of an artifact from a build')
+	.action(function(plan, build_no, artifact_name){
+		return bamboo.getArtifactContent(plan, build_no, artifact_name, function(result) {
+			console.log(result);
+		}
+	);
+});
+
+program
+	.command('jira_issues <plan> <build_no> [dependent_plan]')
+	.description('gets all the JIRA issues associated to a plan - considering dependendent plan too')
+	.action(function(plan, build_no, dependent_plan){
+		return bamboo.getJiraIssuesFromBuild(plan, build_no, dependent_plan, function(result) {
+			console.log(result);
+		}
+	);
+});
+
+program
+	.command('plans')
+	.description('gets the list of all plans available')
+	.action(function(){
+		return bamboo.getAllPlans("", function(result) {
+			console.log(result);
+		}
+	);
+});
+
+program.parse(process.argv);
