@@ -50,6 +50,8 @@ Get the list of JIRA issues (JIRA needs to be integrated with Bamboo) associated
 
 If you work with build pipelines, you know that builds are triggered by other builds. So you might need to find out the JIRA issues associated to the commits done on the build triggering the considered "plan".
 
+Note: For the JIRA integration to work, you need to define the JIRA task in the message of your Git commit.
+
 Get the content of an artifact associated to a specific build of a plan:
 
     bamboo-api artifact <planKey> <build_no> <artifact_name>
