@@ -7,13 +7,23 @@ var bamboo_host = process.env.BAMBOO_URL,
 	bamboo = new Bamboo(bamboo_host);
 
 program
-   .version('0.0.1')
+   .version('0.0.2')
 
 program
 	.command('status <plan>')
 	.description('get the status of the latest build')
 	.action(function(plan){
-		return bamboo.getLatestBuilsStatus(plan, function(result) {
+		return bamboo.getLatestBuildStatus(plan, function(result) {
+			console.log(result);
+		}
+	);
+});
+
+program
+	.command('build_status <build_details>')
+	.description('get the status of the build')
+	.action(function(build_details){
+		return bamboo.getBuildStatus(build_details, function(result) {
 			console.log(result);
 		}
 	);
@@ -30,20 +40,30 @@ program
 });
 
 program
-	.command('artifact <plan> <build_no> <artifact_name>')
+	.command('artifact <build_details> <artifact_name>')
 	.description('gets the content of an artifact from a build')
-	.action(function(plan, build_no, artifact_name){
-		return bamboo.getArtifactContent(plan, build_no, artifact_name, function(result) {
+	.action(function(build_details, artifact_name){
+		return bamboo.getArtifactContent(build_details, artifact_name, function(result) {
 			console.log(result);
 		}
 	);
 });
 
 program
-	.command('jira_issues <plan> <build_no> [dependent_plan]')
+	.command('jira_issues <build_details>')
 	.description('gets all the JIRA issues associated to a plan - considering dependendent plan too')
-	.action(function(plan, build_no, dependent_plan){
-		return bamboo.getJiraIssuesFromBuild(plan, build_no, dependent_plan, function(result) {
+	.action(function(plan, build_details){
+		return bamboo.getJiraIssuesFromBuild(build_details, function(result) {
+			console.log(result);
+		}
+	);
+});
+
+program
+	.command('changes <build_details>')
+	.description('gets all the changes associated to a plan - considering dependendent plan too')
+	.action(function(plan, build_details){
+		return bamboo.getChangesFromBuild(build_details, function(result) {
 			console.log(result);
 		}
 	);
