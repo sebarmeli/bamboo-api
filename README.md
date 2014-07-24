@@ -29,6 +29,18 @@ and then you can use the avaialble mthods, e.g.:
 		// do something here
 	});
 
+Also you can use basic http **authentication** that specified in [RFC 1738](http://www.ietf.org/rfc/rfc1738.txt) by passing
+`username` and `password` to `Bamboo` constructor as second and third parameter.
+
+For example:
+
+```javascript
+var bamboo = new Bamboo("http://www.host:8085", "username", "password");
+
+bamboo.getAllPlans("PRJ_PLAN", function(result) {
+    // do something here
+});
+```
 
 The module can be used from command-line and there are few comamnds available.
 

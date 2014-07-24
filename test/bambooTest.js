@@ -578,3 +578,42 @@ describe ("bamboo.getChangesFromBuild", function(){
   });
 
 });
+
+describe ("bamboo base http authentication, test on bamboo.getLatestSuccessfulBuilNumber method", function(){
+    var baseUrl = 'http://host.com'
+        , username = 'testuser'
+        , password = 'testpassword'
+        , authString = username + ':' + password
+        , encrypted = (new Buffer(authString)).toString('base64')
+        , planKey = "myPrjAuth-myPlanAuth"
+        , result = JSON.stringify({
+            results : {
+                result : [{
+                    number: "22",
+                    state: "Successful"
+                }, {
+                    number: "23",
+                    state: "Failed"
+                }]
+            }
+        })
+        , headerMatch = function(val) { return val == 'Basic ' + encrypted };
+
+    nock(baseUrl).get('/rest/api/latest/result/myPrjAuth-myPlanAuth.json').matchHeader('Authorization', headerMatch).reply(200, result);
+
+    it("should fail, since require authentication", function () {
+        var bamboo = new Bamboo(baseUrl);
+
+        bamboo.getLatestSuccessfulBuilNumber(planKey, false, function(result){
+            result.should.equal("Unreachable endpoint");
+        });
+    });
+
+    it("returns the latest successful build number", function () {
+        var bamboo = new Bamboo(baseUrl, username, password);
+
+        bamboo.getLatestSuccessfulBuilNumber(planKey, false, function(result){
+            result.should.equal("22");
+        });
+    });
+});
