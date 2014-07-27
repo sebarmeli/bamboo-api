@@ -1,6 +1,6 @@
 {
   "name": "bamboo-api",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Node wrapper around Atlassian Bamboo API",
   "main": "./lib/bamboo.js",
   "scripts": {
