@@ -1,82 +1,82 @@
 #!/usr/bin/env node
 
 var program = require('commander'),
-	Bamboo = require('../lib/bamboo');
+    Bamboo = require('../lib/bamboo');
 
 var bamboo_host = process.env.BAMBOO_URL,
-	bamboo = new Bamboo(bamboo_host);
+    bamboo = new Bamboo(bamboo_host);
 
 program
-   .version('0.0.2')
+    .version('0.0.2')
 
 program
-	.command('status <plan>')
-	.description('get the status of the latest build')
-	.action(function(plan){
-		return bamboo.getLatestBuildStatus(plan, function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('status <plan>')
+    .description('get the status of the latest build')
+    .action(function(plan) {
+        return bamboo.getLatestBuildStatus(plan, function(result) {
+                console.log(result);
+            }
+        );
+    });
 
 program
-	.command('build_status <build_details>')
-	.description('get the status of the build')
-	.action(function(build_details){
-		return bamboo.getBuildStatus(build_details, function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('build_status <build_details>')
+    .description('get the status of the build')
+    .action(function(build_details) {
+        return bamboo.getBuildStatus(build_details, function(result) {
+                console.log(result);
+            }
+        );
+    });
 
 program
-	.command('build_no <plan>')
-	.description('get the latest successful build number')
-	.action(function(plan){
-		return bamboo.getLatestSuccessfulBuilNumber(plan, "", function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('build_no <plan>')
+    .description('get the latest successful build number')
+    .action(function(plan) {
+        return bamboo.getLatestSuccessfulBuilNumber(plan, "", function(result) {
+                console.log(result);
+            }
+        );
+    });
 
 program
-	.command('artifact <build_details> <artifact_name>')
-	.description('gets the content of an artifact from a build')
-	.action(function(build_details, artifact_name){
-		return bamboo.getArtifactContent(build_details, artifact_name, function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('artifact <build_details> <artifact_name>')
+    .description('gets the content of an artifact from a build')
+    .action(function(build_details, artifact_name) {
+        return bamboo.getArtifactContent(build_details, artifact_name, function(result) {
+                console.log(result);
+            }
+        );
+    });
 
 program
-	.command('jira_issues <build_details>')
-	.description('gets all the JIRA issues associated to a plan - considering dependendent plan too')
-	.action(function(plan, build_details){
-		return bamboo.getJiraIssuesFromBuild(build_details, function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('jira_issues <build_details>')
+    .description('gets all the JIRA issues associated to a plan - considering dependendent plan too')
+    .action(function(plan, build_details) {
+        return bamboo.getJiraIssuesFromBuild(build_details, function(result) {
+                console.log(result);
+            }
+        );
+    });
 
 program
-	.command('changes <build_details>')
-	.description('gets all the changes associated to a plan - considering dependendent plan too')
-	.action(function(plan, build_details){
-		return bamboo.getChangesFromBuild(build_details, function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('changes <build_details>')
+    .description('gets all the changes associated to a plan - considering dependendent plan too')
+    .action(function(plan, build_details) {
+        return bamboo.getChangesFromBuild(build_details, function(result) {
+                console.log(result);
+            }
+        );
+    });
 
 program
-	.command('plans')
-	.description('gets the list of all plans available')
-	.action(function(){
-		return bamboo.getAllPlans("", function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('plans')
+    .description('gets the list of all plans available')
+    .action(function() {
+        return bamboo.getAllPlans("", function(result) {
+                console.log(result);
+            }
+        );
+    });
 
 program.parse(process.argv);
