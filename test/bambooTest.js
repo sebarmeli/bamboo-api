@@ -2,12 +2,19 @@ var Bamboo = require('../lib/bamboo'),
     should = require('should'),
     nock = require('nock');
 
-describe("bamboo.getLatestSuccessfulBuilNumber", function() {
+var baseTestUrl = 'http://host.com',
+    testPlanKey = 'myPrj-myPlan',
+    testApiUrl = '/rest/api/latest/result',
+    testPlanResultUrl = testApiUrl + '/' + testPlanKey + '.json',
+    testPlanLatest = '/rest/api/latest/plan.json';
+
+describe("bamboo.getLatestSuccessfulBuildNumber", function() {
+    "use strict";
 
     it("returns the latest successful build number", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json')
+        nock(baseTestUrl)
+            .get(testPlanResultUrl)
             .reply(200, JSON.stringify({
                 results: {
                     result: [
@@ -23,44 +30,17 @@ describe("bamboo.getLatestSuccessfulBuilNumber", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getLatestSuccessfulBuilNumber("myPrj-myPlan", "", function(result) {
-            result.should.equal("22");
-        });
-    });
-});
-
-describe("bamboo.getLatestSuccessfulBuilNumber", function() {
-
-    it("returns the latest successful build number", function() {
-
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json')
-            .reply(200, JSON.stringify({
-                results: {
-                    result: [
-                        {
-                            number: "23",
-                            state: "Failed"
-                        },
-                        {
-                            number: "22",
-                            state: "Successful"
-                        }
-                    ]
-                }
-            }));
-
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getLatestSuccessfulBuilNumber("myPrj-myPlan", "", function(result) {
-            result.should.equal("22");
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getLatestSuccessfulBuildNumber(testPlanKey, "", function(error, result) {
+            should.equal(error, null);
+            result.toString().should.equal("22");
         });
     });
 
     it("returns a msg when the plan doesn't contain any successful build", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json')
+        nock(baseTestUrl)
+            .get(testPlanResultUrl)
             .reply(200, JSON.stringify({
                 results: {
                     result: [
@@ -76,16 +56,17 @@ describe("bamboo.getLatestSuccessfulBuilNumber", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getLatestSuccessfulBuilNumber("myPrj-myPlan", "", function(result) {
-            result.should.equal("The plan doesn't contain any successful build");
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getLatestSuccessfulBuildNumber(testPlanKey, "", function(error, result) {
+            error.toString().should.equal("Error: The plan doesn't contain any successful build");
+            should.equal(result, null);
         });
     });
 
     it("returns a msg when the plan doesn't contain any successful build", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json')
+        nock(baseTestUrl)
+            .get(testPlanResultUrl)
             .reply(200, JSON.stringify({
                 results: {
                     size: 3,
@@ -104,8 +85,8 @@ describe("bamboo.getLatestSuccessfulBuilNumber", function() {
                 }
             }));
 
-        var fake2 = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json?start-index=2')
+        nock(baseTestUrl)
+            .get(testPlanResultUrl + '?start-index=2')
             .reply(200, JSON.stringify({
                 results: {
                     size: 3,
@@ -120,44 +101,47 @@ describe("bamboo.getLatestSuccessfulBuilNumber", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getLatestSuccessfulBuilNumber("myPrj-myPlan", "", function(result) {
-            result.should.equal("The plan doesn't contain any successful build");
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getLatestSuccessfulBuildNumber(testPlanKey, "", function(error, result) {
+            error.toString().should.equal("Error: The plan doesn't contain any successful build");
+            should.equal(result, null);
         });
     });
 
     it("returns a msg when the plan doesn't contain any result", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json')
+        nock(baseTestUrl)
+            .get(testPlanResultUrl)
             .reply(200, JSON.stringify({
                 results: {
                     result: []
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getLatestSuccessfulBuilNumber("myPrj-myPlan", "", function(result) {
-            result.should.equal("The plan doesn't contain any result");
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getLatestSuccessfulBuildNumber(testPlanKey, "", function(error, result) {
+            error.toString().should.equal("Error: The plan doesn't contain any result");
+            should.equal(result, null);
         });
     });
 
     it("returns a msg when the plan doesn't exist", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json')
+        nock(baseTestUrl)
+            .get(testPlanResultUrl)
             .reply(404);
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getLatestSuccessfulBuilNumber("myPrj-myPlan", "", function(result) {
-            result.should.equal("Unreachable endpoint");
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getLatestSuccessfulBuildNumber(testPlanKey, "", function(error, result) {
+            error.toString().should.equal("Error: Unreachable endpoint");
+            should.equal(result, null);
         });
     });
 
     it("returns the latest successful build number in multiple 'requests'", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json')
+        nock(baseTestUrl)
+            .get(testPlanResultUrl)
             .reply(200, JSON.stringify({
                 results: {
                     size: 3,
@@ -176,8 +160,8 @@ describe("bamboo.getLatestSuccessfulBuilNumber", function() {
                 }
             }));
 
-        var fake2 = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json?start-index=2')
+        nock(baseTestUrl)
+            .get(testPlanResultUrl + '?start-index=2')
             .reply(200, JSON.stringify({
                 results: {
                     size: 3,
@@ -192,34 +176,40 @@ describe("bamboo.getLatestSuccessfulBuilNumber", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getLatestSuccessfulBuilNumber("myPrj-myPlan", "", function(result) {
-            result.should.equal("21");
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getLatestSuccessfulBuildNumber(testPlanKey, "", function(error, result) {
+            should.equal(error, null);
+            result.toString().should.equal("21");
         });
     });
 });
 
 describe("bamboo.getBuildStatus", function() {
+    "use strict";
+
     it("returns the build Status", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/myPlan-213.json')
+        nock(baseTestUrl)
+            .get(testApiUrl + '/' + testPlanKey + '/416.json')
             .reply(200, JSON.stringify({
                 lifeCycleState: "InProgress"
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getBuildStatus("myPlan-213", function(result) {
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getBuildStatus(testPlanKey + '/416', function(error, result) {
+            should.equal(error, null);
             result.should.equal("InProgress");
         });
     });
 });
 
 describe("bamboo.getLatestBuildStatus", function() {
+    "use strict";
+
     it("returns the latest build Status", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json')
+        nock(baseTestUrl)
+            .get(testPlanResultUrl)
             .reply(200, JSON.stringify({
                 results: {
                     result: [
@@ -239,16 +229,18 @@ describe("bamboo.getLatestBuildStatus", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getLatestBuildStatus("myPrj-myPlan", function(result) {
-            result.should.equal("Failed");
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getLatestBuildStatus(testPlanKey, function(error, state, number) {
+            should.equal(error, null);
+            state.should.equal("Failed");
+            number.should.equal("23");
         });
     });
 
     it("returns the latest build Status", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json')
+        nock(baseTestUrl)
+            .get(testPlanResultUrl)
             .reply(200, JSON.stringify({
                 results: {
                     size: 3,
@@ -258,48 +250,22 @@ describe("bamboo.getLatestBuildStatus", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getLatestBuildStatus("myPrj-myPlan", function(result) {
-            result.should.equal("The plan doesn't contain any result");
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getLatestBuildStatus(testPlanKey, function(error, state, number) {
+            error.toString().should.equal("Error: The plan doesn't contain any result");
+            should.equal(state, null);
+            should.equal(number, null);
         });
     });
-
-    it("returns the latest status and the build number", function() {
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/myPrj-myPlan.json')
-            .reply(200, JSON.stringify({
-                results: {
-                    result: [
-                        {
-                            number: "23",
-                            state: "Failed"
-                        },
-                        {
-                            number: "22",
-                            state: "Failed"
-                        },
-                        {
-                            number: "21",
-                            state: "Successful"
-                        }
-                    ]
-                }
-            }));
-
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getLatestBuildStatus("myPrj-myPlan", function(result, resultNo) {
-            result.should.equal("Failed");
-            resultNo.should.equal("23");
-        });
-    });
-
 });
 
 describe("bamboo.getAllPlans", function() {
+    "use strict";
+
     it("returns a list of all plans available", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/plan.json')
+        nock(baseTestUrl)
+            .get(testPlanLatest)
             .reply(200, JSON.stringify({
                 plans: {
                     size: 3,
@@ -318,8 +284,8 @@ describe("bamboo.getAllPlans", function() {
                 }
             }));
 
-        var fake2 = nock('http://host.com')
-            .get('/rest/api/latest/plan.json?start-index=2')
+        nock(baseTestUrl)
+            .get(testPlanLatest + '?start-index=2')
             .reply(200, JSON.stringify({
                 plans: {
                     size: 5,
@@ -338,8 +304,8 @@ describe("bamboo.getAllPlans", function() {
                 }
             }));
 
-        var fake3 = nock('http://host.com')
-            .get('/rest/api/latest/plan.json?start-index=4')
+        nock(baseTestUrl)
+            .get(testPlanLatest + '?start-index=4')
             .reply(200, JSON.stringify({
                 plans: {
                     size: 5,
@@ -354,8 +320,9 @@ describe("bamboo.getAllPlans", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getAllPlans("", function(result) {
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getAllPlans("", function(error, result) {
+            should.equal(error, null);
             result.should.eql([
                 {
                     key: "AA-BB",
@@ -383,8 +350,8 @@ describe("bamboo.getAllPlans", function() {
 
     it("returns a string saying that there are no plans", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/plan.json')
+        nock(baseTestUrl)
+            .get(testPlanLatest)
             .reply(200, JSON.stringify({
                 plans: {
                     size: 3,
@@ -394,33 +361,39 @@ describe("bamboo.getAllPlans", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getAllPlans("", function(result) {
-            result.should.equal("No plans available");
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getAllPlans("", function(error, result) {
+            error.toString().should.equal("Error: No plans available");
+            should.equal(result, null);
         });
     });
 
 });
 
 describe("bamboo.getArtifactContent", function() {
+    "use strict";
+
     it("returns the latest successful build number", function() {
 
-        var fake = nock('http://host.com')
+        nock(baseTestUrl)
             .get('/browse/myPrj-myPlan-234/artifact/shared/name1/name1')
             .reply(200, "AAA");
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getArtifactContent("myPrj-myPlan-234", "name1", function(result) {
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getArtifactContent("myPrj-myPlan-234", "name1", function(error, result) {
+            should.equal(error, null);
             result.should.equal("AAA");
         });
     });
 });
 
 describe("bamboo.getJiraIssuesFromBuild", function() {
+    "use strict";
+
     it("returns the list of JIRA task from a build - no dependent plan", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/plan1-234.json?expand=jiraIssues')
+        nock(baseTestUrl)
+            .get(testApiUrl + '/plan1-234.json?expand=jiraIssues')
             .reply(200, JSON.stringify({
                 buildReason: "",
                 jiraIssues: {
@@ -435,16 +408,17 @@ describe("bamboo.getJiraIssuesFromBuild", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getJiraIssuesFromBuild("plan1-234", function(result) {
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getJiraIssuesFromBuild("plan1-234", function(error, result) {
+            should.equal(error, null);
             result.should.eql(["AAA", "BBB"]);
         });
     });
 
     it("returns the list of JIRA task from a build - dependent on planB", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/plan1-234.json?expand=jiraIssues')
+        nock(baseTestUrl)
+            .get(testApiUrl + '/plan1-234.json?expand=jiraIssues')
             .reply(200, JSON.stringify({
                 buildReason: "Child of <a>plan2-99</a>",
                 jiraIssues: {
@@ -459,8 +433,8 @@ describe("bamboo.getJiraIssuesFromBuild", function() {
                 }
             }));
 
-        var fake2 = nock('http://host.com')
-            .get('/rest/api/latest/result/plan2-99.json?expand=jiraIssues')
+        nock(baseTestUrl)
+            .get(testApiUrl + '/plan2-99.json?expand=jiraIssues')
             .reply(200, JSON.stringify({
                 buildReason: "Child of <a>plan3-11</a>",
                 jiraIssues: {
@@ -475,8 +449,8 @@ describe("bamboo.getJiraIssuesFromBuild", function() {
                 }
             }));
 
-        var fake3 = nock('http://host.com')
-            .get('/rest/api/latest/result/plan3-11.json?expand=jiraIssues')
+        nock(baseTestUrl)
+            .get(testApiUrl + '/plan3-11.json?expand=jiraIssues')
             .reply(200, JSON.stringify({
                 buildReason: "Changes by <a>XX</a>",
                 jiraIssues: {
@@ -491,17 +465,20 @@ describe("bamboo.getJiraIssuesFromBuild", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getJiraIssuesFromBuild("plan1-234", function(result) {
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getJiraIssuesFromBuild("plan1-234", function(error, result) {
+            should.equal(error, null);
             result.should.eql(["AAA", "BBB", "CCC", "DDD", "EEE"]);
         });
     });
 });
 describe("bamboo.getChangesFromBuild", function() {
+    "use strict";
+
     it("returns the list of changes from a build - no dependent plan", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/plan1-234.json?expand=changes')
+        nock(baseTestUrl)
+            .get(testPlanResultUrl + '?expand=changes')
             .reply(200, JSON.stringify({
                 changes: {
                     change: [
@@ -515,16 +492,17 @@ describe("bamboo.getChangesFromBuild", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getChangesFromBuild("plan1-234", function(result) {
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getChangesFromBuild(testPlanKey, function(error, result) {
+            should.equal(error, null);
             result.should.eql(["Paul Smith", "Mark Rose"]);
         });
     });
 
     it("returns the list of JIRA task from a build - dependent on planB", function() {
 
-        var fake = nock('http://host.com')
-            .get('/rest/api/latest/result/plan1-234.json?expand=changes')
+        nock(baseTestUrl)
+            .get(testApiUrl + '/plan1-234.json?expand=changes')
             .reply(200, JSON.stringify({
                 buildReason: "Child of <a>plan2-99</a>",
                 changes: {
@@ -539,8 +517,8 @@ describe("bamboo.getChangesFromBuild", function() {
                 }
             }));
 
-        var fake2 = nock('http://host.com')
-            .get('/rest/api/latest/result/plan2-99.json?expand=changes')
+        nock(baseTestUrl)
+            .get(testApiUrl + '/plan2-99.json?expand=changes')
             .reply(200, JSON.stringify({
                 buildReason: "Child of <a>plan3-11</a>",
                 changes: {
@@ -555,8 +533,8 @@ describe("bamboo.getChangesFromBuild", function() {
                 }
             }));
 
-        var fake3 = nock('http://host.com')
-            .get('/rest/api/latest/result/plan3-11.json?expand=changes')
+        nock(baseTestUrl)
+            .get(testApiUrl + '/plan3-11.json?expand=changes')
             .reply(200, JSON.stringify({
                 buildReason: "Changes by <a>XX</a>",
                 changes: {
@@ -571,22 +549,24 @@ describe("bamboo.getChangesFromBuild", function() {
                 }
             }));
 
-        var bamboo = new Bamboo("http://host.com");
-        bamboo.getChangesFromBuild("plan1-234", function(result) {
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.getChangesFromBuild("plan1-234", function(error, result) {
+            should.equal(error, null);
             result.should.eql(["Paul Smith", "Mark Rose", "Eric Red", "Mark White", "Cait Black", "Louise Yellow"]);
         });
     });
 
 });
 
-describe("bamboo base http authentication, test on bamboo.getLatestSuccessfulBuilNumber method", function() {
-    var baseUrl = 'http://host.com'
-        , username = 'testuser'
-        , password = 'testpassword'
-        , authString = username + ':' + password
-        , encrypted = (new Buffer(authString)).toString('base64')
-        , planKey = "myPrjAuth-myPlanAuth"
-        , result = JSON.stringify({
+describe("bamboo base http authentication, test on bamboo.getLatestSuccessfulBuildNumber method", function() {
+    "use strict";
+
+    var username = 'testuser',
+        password = 'testpassword',
+        authString = username + ':' + password,
+        encrypted = (new Buffer(authString)).toString('base64'),
+        planKey = "myPrjAuth-myPlanAuth",
+        result = JSON.stringify({
             results: {
                 result: [
                     {
@@ -599,23 +579,24 @@ describe("bamboo base http authentication, test on bamboo.getLatestSuccessfulBui
                     }
                 ]
             }
-        })
-        , headerMatch = function(val) { return val == 'Basic ' + encrypted };
+        }),
+        headerMatch = function(val) { return val === 'Basic ' + encrypted; };
 
-    nock(baseUrl).get('/rest/api/latest/result/myPrjAuth-myPlanAuth.json').matchHeader('Authorization', headerMatch).reply(200, result);
+    nock(baseTestUrl).get(testApiUrl + '/' + planKey + '.json').matchHeader('Authorization', headerMatch).reply(200, result);
 
     it("should fail, since require authentication", function() {
-        var bamboo = new Bamboo(baseUrl);
+        var bamboo = new Bamboo(baseTestUrl);
 
-        bamboo.getLatestSuccessfulBuilNumber(planKey, false, function(result) {
-            result.should.equal("Unreachable endpoint");
+        bamboo.getLatestSuccessfulBuildNumber(planKey, false, function(error, result) {
+            should.equal(result, null);
         });
     });
 
     it("returns the latest successful build number", function() {
-        var bamboo = new Bamboo(baseUrl, username, password);
+        var bamboo = new Bamboo(baseTestUrl, username, password);
 
-        bamboo.getLatestSuccessfulBuilNumber(planKey, false, function(result) {
+        bamboo.getLatestSuccessfulBuildNumber(planKey, false, function(error, result) {
+            should.equal(error, null);
             result.should.equal("22");
         });
     });
