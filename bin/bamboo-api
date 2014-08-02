@@ -1,82 +1,130 @@
 #!/usr/bin/env node
 
+"use strict";
+
 var program = require('commander'),
-	Bamboo = require('../lib/bamboo');
+    Bamboo = require('../lib/bamboo'),
+    packageJson = require('../package');
 
-var bamboo_host = process.env.BAMBOO_URL,
-	bamboo = new Bamboo(bamboo_host);
-
-program
-   .version('0.0.2')
+var bambooHost = process.env.BAMBOO_URL,
+    bamboo = new Bamboo(bambooHost);
 
 program
-	.command('status <plan>')
-	.description('get the status of the latest build')
-	.action(function(plan){
-		return bamboo.getLatestBuildStatus(plan, function(result) {
-			console.log(result);
-		}
-	);
+    .version(packageJson.version)
+    .usage('[command] <params...>');
+
+program.on('--help', function(){
+    console.log('  Environment variables:');
+    console.log('');
+    console.log('    BAMBOO_URL          Bamboo\'s UR (default: \'http://localhost:8085\').');
+    console.log('                        Note: you can use base authentication using url,');
+    console.log('                        Simply pass the \'user:password\' before the host');
+    console.log('                        with an \'@\' sign.');
+    console.log('');
+    console.log('                        For example: http://user:password@example.com');
+    console.log('');
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ bamboo-api build_status "PROJECT_KEY-PLAN_KEY/BUILD_NUMBER"');
+    console.log('    > InProgress');
+    console.log('');
 });
 
 program
-	.command('build_status <build_details>')
-	.description('get the status of the build')
-	.action(function(build_details){
-		return bamboo.getBuildStatus(build_details, function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('build_no <PROJECT_KEY-PLAN_KEY>')
+    .description('get the latest successful build number')
+    .usage('<PROJECT_KEY-PLAN_KEY>')
+    .action(function(planKey) {
+        return bamboo.getLatestSuccessfulBuildNumber(planKey, "", function(error, result) {
+                console.log(">", error ? error.toString() : result);
+            }
+        );
+    });
 
 program
-	.command('build_no <plan>')
-	.description('get the latest successful build number')
-	.action(function(plan){
-		return bamboo.getLatestSuccessfulBuilNumber(plan, "", function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('status <PROJECT_KEY-PLAN_KEY>')
+    .description('get status and build number of the latest build')
+    .usage('<PROJECT_KEY-PLAN_KEY>')
+    .action(function(planKey) {
+        return bamboo.getLatestBuildStatus(planKey, function(error, state, number) {
+                if (error) {
+                    console.log(">", error.toString());
+                } else {
+                    console.log("> State: ", state);
+                    console.log("> Number: ", number);
+                }
+            }
+        );
+    });
 
 program
-	.command('artifact <build_details> <artifact_name>')
-	.description('gets the content of an artifact from a build')
-	.action(function(build_details, artifact_name){
-		return bamboo.getArtifactContent(build_details, artifact_name, function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('build_status <PROJECT_KEY-PLAN_KEY/BUILD_NUMBER>')
+    .description('get the status of the build')
+    .usage('<PROJECT_KEY-PLAN_KEY/BUILD_NUMBER>')
+    .action(function(buildDetails) {
+        return bamboo.getBuildStatus(buildDetails, function(error, result) {
+                console.log(">", error ? error.toString() : result);
+            }
+        );
+    });
 
 program
-	.command('jira_issues <build_details>')
-	.description('gets all the JIRA issues associated to a plan - considering dependendent plan too')
-	.action(function(plan, build_details){
-		return bamboo.getJiraIssuesFromBuild(build_details, function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('changes <PROJECT_KEY-PLAN_KEY/BUILD_NUMBER>')
+    .description('gets all the changes associated to a specific build - considering dependent plan too')
+    .usage('<PROJECT_KEY-PLAN_KEY/BUILD_NUMBER>')
+    .action(function(buildDetails) {
+        return bamboo.getChangesFromBuild(buildDetails, function(error, result) {
+                console.log(">", error ? error.toString() : result);
+            }
+        );
+    });
 
 program
-	.command('changes <build_details>')
-	.description('gets all the changes associated to a plan - considering dependendent plan too')
-	.action(function(plan, build_details){
-		return bamboo.getChangesFromBuild(build_details, function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('jira_issues <PROJECT_KEY-PLAN_KEY/BUILD_NUMBER>')
+    .description('gets all the JIRA issues associated to a specific build - considering dependent plan too')
+    .usage('<PROJECT_KEY-PLAN_KEY/BUILD_NUMBER>')
+    .action(function(buildDetails) {
+        return bamboo.getJiraIssuesFromBuild(buildDetails, function(error, result) {
+                console.log(">", error ? error.toString() : result);
+            }
+        );
+    });
 
 program
-	.command('plans')
-	.description('gets the list of all plans available')
-	.action(function(){
-		return bamboo.getAllPlans("", function(result) {
-			console.log(result);
-		}
-	);
-});
+    .command('artifact <PROJECT_KEY-PLAN_KEY/BUILD_NUMBER> <ARTIFACT_NAME>')
+    .description('gets the content of an artifact associated to a build')
+    .usage('<PROJECT_KEY-PLAN_KEY/BUILD_NUMBER> <ARTIFACT_NAME>')
+    .action(function(buildDetails, artifactName) {
+        return bamboo.getArtifactContent(buildDetails, artifactName, function(error, result) {
+                console.log(">", error ? error.toString() : result);
+            }
+        );
+    });
+
+program
+    .command('plans')
+    .description('gets the list of all plans available')
+    .usage('')
+    .action(function() {
+        return bamboo.getAllPlans("", function(error, result) {
+                console.log(">", error ? error.toString() : result);
+            }
+        );
+    });
 
 program.parse(process.argv);
+
+if (typeof bambooHost === "undefined") {
+    console.log('> ERROR: Before use of Bamboo API command line, specified global variable BAMBOO_URL in your environment!');
+    console.log('');
+    console.log('    For *nix users:');
+    console.log('');
+    console.log('      export BAMBOO_URL="BAMBOO_URL_HERE"');
+    console.log('');
+    console.log('    For Windows users:');
+    console.log('');
+    console.log('      set BAMBOO_URL="BAMBOO_URL_HERE"');
+    console.log('');
+    console.log('  For more information use --help or read README file.');
+    return;
+}

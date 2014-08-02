@@ -4,7 +4,7 @@
   "description": "Node wrapper around Atlassian Bamboo API",
   "main": "./lib/bamboo.js",
   "scripts": {
-    "test": "mocha"
+    "test": "./node_modules/.bin/mocha"
   },
   "bin": {
     "bamboo-api": "./bin/bamboo-api"
@@ -42,5 +42,6 @@
       "type": "MIT",
       "url": "http://github.com/sebarmeli/bamboo-api/raw/master/LICENSE"
     }
-  ]
+  ],
+    "contributors"  : ["Pavlo Voznenko <p.voznenko@gmail.com> (https://twitter.com/pvoznenko/)"]
 }
