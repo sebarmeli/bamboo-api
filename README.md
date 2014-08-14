@@ -1,4 +1,6 @@
-# Bamboo API [![Build Status](https://travis-ci.org/sebarmeli/bamboo-api.png)](https://travis-ci.org/sebarmeli/bamboo-api)
+# Bamboo API
+[![Build Status](https://travis-ci.org/sebarmeli/bamboo-api.png)](https://travis-ci.org/sebarmeli/bamboo-api)
+[![NPM version](https://img.shields.io/npm/v/bamboo-api.svg)](https://www.npmjs.org/package/bamboo-api)
 
 
 Node.js module wrapping the [Atlassian Bamboo REST API](https://developer.atlassian.com/display/BAMBOODEV/Bamboo+REST+APIs).
