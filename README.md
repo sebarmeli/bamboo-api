@@ -152,7 +152,7 @@ bamboo.getArtifactContent("PROJECT_KEY-PLAN_KEY/BUILD_NUMBER", "artifact", funct
 Get list of plans, key and names available.
 
 ```javascript
-bamboo.getArtifactContent("?start-index=25", function(error, result) {
+bamboo.getAllPlans("?start-index=25", function(error, result) {
     if (error) {
         console.log(error);
         return;
