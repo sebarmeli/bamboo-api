@@ -387,6 +387,26 @@ describe("bamboo.getArtifactContent", function() {
     });
 });
 
+describe("bamboo.getArtifactContentStream", function() {
+    "use strict";
+
+    it("returns the latest successful build number", function(done) {
+        nock(baseTestUrl)
+            .get('/browse/myPrj-myPlan-234/artifact/shared/name1/name1')
+            .reply(200, "AAA");
+
+        var bamboo = new Bamboo(baseTestUrl);
+        var stream = bamboo.getArtifactContentStream("myPrj-myPlan-234", "name1");
+
+        stream.on('error', done);
+        stream.on('readable', function () {
+          stream.read(3).toString().should.equal("AAA");
+          done();
+        });
+    });
+});
+
+
 describe("bamboo.getJiraIssuesFromBuild", function() {
     "use strict";
 

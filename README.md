@@ -147,6 +147,22 @@ bamboo.getArtifactContent("PROJECT_KEY-PLAN_KEY/BUILD_NUMBER", "artifact", funct
 });
 ```
 
+#### bamboo.getArtifactContentStream(buildDetails, artifactName)
+
+Get a stream of the content of an artifact associated to a build.
+
+```javascript
+var stream = bamboo.getArtifactContentStream("PROJECT_KEY-PLAN_KEY/BUILD_NUMBER", "artifact");
+
+stream.on('error', function (error) {
+    console.log(error);
+});
+
+stream.on('data', function (data) {
+  console.log(data);
+});
+```
+
 #### bamboo.getAllPlans(params, callback, currentPlans)
 
 Get list of plans, key and names available.
