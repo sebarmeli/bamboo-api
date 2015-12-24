@@ -112,6 +112,17 @@ program
         );
     });
 
+program
+    .command('buildPlan <PROJECT_KEY-PLAN_KEY> <PARAMS>')
+        .description('Execute build plan')
+        .usage('<PROJECT_KEY-PLAN_KEY> <PARAMS>')
+        .action(function(buildDetails, params) {
+            return bamboo.buildPlan(buildDetails, JSON.parse(params), function(error, result) {
+                    console.log(">", error ? error.toString() : result);
+                }
+            );
+        });
+
 program.parse(process.argv);
 
 if (typeof bambooHost === "undefined") {
