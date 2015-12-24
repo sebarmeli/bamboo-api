@@ -120,7 +120,7 @@ describe("bamboo.getLatestSuccessfulBuildNumber", function() {
 
         var bamboo = new Bamboo(baseTestUrl);
         bamboo.getLatestSuccessfulBuildNumber(testPlanKey, "", function(error, result) {
-            error.toString().should.equal("Error: The plan doesn't contain any result");
+            error.toString().should.equal("Error: The plan doesn\'t contain any result");
             should.equal(result, null);
         });
     });
@@ -397,11 +397,13 @@ describe("bamboo.getArtifactContentStream", function() {
 
         var bamboo = new Bamboo(baseTestUrl);
         var stream = bamboo.getArtifactContentStream("myPrj-myPlan-234", "name1");
-
         stream.on('error', done);
         stream.on('readable', function () {
-          stream.read(3).toString().should.equal("AAA");
-          done();
+            var chunk;
+            while (null !== (chunk = stream.read())) {
+                chunk.toString().should.equal("AAA");
+                done();
+            }
         });
     });
 });
