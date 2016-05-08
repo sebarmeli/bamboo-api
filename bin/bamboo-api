@@ -31,14 +31,22 @@ program.on('--help', function(){
 });
 
 program
-    .command('build_no <PROJECT_KEY-PLAN_KEY>')
+    .command('build_no <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>')
     .description('get the latest successful build number')
-    .usage('<PROJECT_KEY-PLAN_KEY>')
-    .action(function(planKey) {
+    .usage('<PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>')
+    .action(function(planKey, urlParams) {
+        urlParams = urlParams || {};
+
+        try {
+            urlParams = JSON.parse(urlParams);
+        } catch (parseError) {
+            console.log("> OPTIONAL_URL_PARAMS parse error: ", parseError.toString());
+            return;
+        }
+
         return bamboo.getLatestSuccessfulBuildNumber(planKey, "", function(error, result) {
-                console.log(">", error ? error.toString() : result);
-            }
-        );
+            console.log(">", error ? error.toString() : result);
+        }, urlParams);
     });
 
 program
@@ -106,7 +114,7 @@ program
     .description('gets the list of all plans available')
     .usage('')
     .action(function() {
-        return bamboo.getAllPlans("", function(error, result) {
+        return bamboo.getAllPlans(function(error, result) {
                 console.log(">", error ? error.toString() : result);
             }
         );
@@ -124,15 +132,69 @@ program
     });
 
 program
-    .command('buildPlan <PROJECT_KEY-PLAN_KEY> <PARAMS>')
-        .description('Execute build plan')
-        .usage('<PROJECT_KEY-PLAN_KEY> <PARAMS>')
-        .action(function(buildDetails, params) {
-            return bamboo.buildPlan(buildDetails, JSON.parse(params), function(error, result) {
-                    console.log(">", error ? error.toString() : result);
-                }
-            );
-        });
+    .command('buildPlan <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS> <OPTIONAL_BUILD_PARAMS>')
+    .description('Execute build plan')
+    .usage('<PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS> <OPTIONAL_BUILD_PARAMS>')
+    .action(function(buildDetails, urlParams, buildParams) {
+        urlParams = urlParams || {};
+        buildParams = buildParams || {};
+
+        try {
+            urlParams = JSON.parse(urlParams);
+        } catch (parseError) {
+            console.log("> OPTIONAL_URL_PARAMS parse error: ", parseError.toString());
+            return;
+        }
+
+        try {
+            buildParams = JSON.parse(buildParams);
+        } catch (parseError) {
+            console.log("> OPTIONAL_BUILD_PARAMS parse error: ", parseError.toString());
+            return;
+        }
+
+        return bamboo.buildPlan(buildDetails, function(error, result) {
+            console.log(">", error ? error.toString() : result);
+        }, urlParams, JSON.parse(buildParams));
+    });
+
+program
+    .command('enablePlan <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>')
+    .description('Enable build plan')
+    .usage('<PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>')
+    .action(function(buildDetails, urlParams) {
+        urlParams = urlParams || {};
+
+        try {
+            urlParams = JSON.parse(urlParams);
+        } catch (parseError) {
+            console.log("> OPTIONAL_URL_PARAMS parse error: ", parseError.toString());
+            return;
+        }
+
+        return bamboo.buildPlan(buildDetails, function(error, result) {
+            console.log(">", error ? error.toString() : result);
+        }, urlParams);
+    });
+
+program
+    .command('search <ENTITY_TO_SEARCH> <OPTIONAL_URL_PARAMS>')
+    .description('Perform search')
+    .usage('<ENTITY_TO_SEARCH> <OPTIONAL_URL_PARAMS>')
+    .action(function(entityToSearch, urlParams) {
+        urlParams = urlParams || {};
+
+        try {
+            urlParams = JSON.parse(urlParams);
+        } catch (parseError) {
+            console.log("> OPTIONAL_URL_PARAMS parse error: ", parseError.toString());
+            return;
+        }
+
+        return bamboo.search(entityToSearch, function(error, result) {
+            console.log(">", error ? error.toString() : result);
+        }, urlParams);
+    });
 
 program.parse(process.argv);
 
