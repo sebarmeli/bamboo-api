@@ -212,7 +212,6 @@ describe("bamboo.createBranchPlan", function() {
     
     var url = "/rest/api/latest/plan/" + testPlanKey + "/branch/" + bambooBranchName + ".json";
     
-console.log(url);
     it("create a branch plan", function() {
 
         nock(baseTestUrl)
@@ -234,6 +233,7 @@ console.log(url);
         var bamboo = new Bamboo(baseTestUrl);
         bamboo.createBranchPlan(testPlanKey, bambooBranchName, vcsBranchName, function(error, result) {
             should.equal(error, null);
+            should.equal(result, testPlanKey + 1);
         });
     });
     
@@ -248,8 +248,6 @@ console.log(url);
 
         var bamboo = new Bamboo(baseTestUrl);
         bamboo.createBranchPlan(testPlanKey, bambooBranchName, vcsBranchName, function(error, result) {
-            console.log(error);
-            console.log(result);
             error.toString().length.should.be.above(10);
             should.equal(result, null);
         });
