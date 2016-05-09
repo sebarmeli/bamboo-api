@@ -56,22 +56,26 @@ bamboo.getLatestBuildStatus("PROJECT_KEY-PLAN_KEY", function(error, result) {
 
 ### Available methods
 
-#### bamboo.getLatestSuccessfulBuildNumber(planKey, params, callback)
+#### getLatestSuccessfulBuildNumber(planKey, callback, urlParams)
 
 Get the latest successful build number.
 
+Parameter `urlParams` - optional parameter, object with params for url, like `{'start-index': 25, 'os_authType': 'basic'}`.
+
 ```javascript
-bamboo.getLatestSuccessfulBuildNumber("PROJECT_KEY-PLAN_KEY", false, function(error, result) {
+var urlParams = {"start-index": 25, "os_authType": "basic"};
+
+bamboo.getLatestSuccessfulBuildNumber("PROJECT_KEY-PLAN_KEY", function(error, result) {
     if (error) {
         console.log(error);
         return;
     }
 
     console.log("Latest successful build number:", result);
-});
+}, urlParams);
 ```
 
-#### bamboo.getLatestBuildStatus(planKey, callback)
+#### getLatestBuildStatus(planKey, callback)
 
 Get latest build status: state and number.
 
@@ -87,7 +91,7 @@ bamboo.getLatestSuccessfulBuildNumber("PROJECT_KEY-PLAN_KEY", function(error, st
 });
 ```
 
-#### bamboo.getBuildStatus(buildDetails, callback)
+#### getBuildStatus(buildDetails, callback)
 
 Get status of the build.
 
@@ -102,7 +106,7 @@ bamboo.getBuildStatus("PROJECT_KEY-PLAN_KEY/BUILD_NUMBER", function(error, resul
 });
 ```
 
-#### bamboo.getChangesFromBuild(buildDetails, callback)
+#### getChangesFromBuild(buildDetails, callback)
 
 Get changes associated to a specific build. It also considers a dependent plan recursively.
 
@@ -117,7 +121,7 @@ bamboo.getChangesFromBuild("PROJECT_KEY-PLAN_KEY/BUILD_NUMBER", function(error, 
 });
 ```
 
-#### bamboo.getJiraIssuesFromBuild(buildDetails, callback)
+#### getJiraIssuesFromBuild(buildDetails, callback)
 
 Get jira issues associated to a specific build. It also considers a dependent plan.
 
@@ -132,7 +136,7 @@ bamboo.getJiraIssuesFromBuild("PROJECT_KEY-PLAN_KEY/BUILD_NUMBER", function(erro
 });
 ```
 
-#### bamboo.getArtifactContent(buildDetails, artifactName, callback)
+#### getArtifactContent(buildDetails, artifactName, callback)
 
 Get content of an artifact associated to a build.
 
@@ -147,7 +151,7 @@ bamboo.getArtifactContent("PROJECT_KEY-PLAN_KEY/BUILD_NUMBER", "artifact", funct
 });
 ```
 
-#### bamboo.getArtifactContentStream(buildDetails, artifactName)
+#### getArtifactContentStream(buildDetails, artifactName)
 
 Get a stream of the content of an artifact associated to a build.
 
@@ -163,22 +167,102 @@ stream.on('data', function (data) {
 });
 ```
 
-#### bamboo.getAllPlans(params, callback, currentPlans)
+#### getAllPlans(callback, urlParams, currentPlans)
 
 Get list of plans, key and names available.
 
+Parameter `urlParams` - optional parameter, object with params for url, like `{'start-index': 25, 'os_authType': 'basic'}`.
+Parameter `currentPlans` is optional, list of plans available (each plan has a 'key' and a 'name' value).
+
 ```javascript
-bamboo.getAllPlans("?start-index=25", function(error, result) {
+var urlParams = {"start-index": 25, "os_authType": "basic"};
+var currentPlans = ["PROJECT_KEY-PLAN_KEY_1", "PROJECT_KEY-PLAN_KEY_2"];
+
+bamboo.getAllPlans(function(error, result) {
     if (error) {
         console.log(error);
         return;
     }
 
     console.log("Plans:", result);
-});
+}, currentPlans, urlParams);
 ```
 
-#### bamboo.createBranchPlan(planKey, bambooBranchName, vcsBranchName, callback)
+#### buildPlan(buildDetails, callback, urlParams, buildParams)
+
+Fire build execution for specified plan. Effectively, this method adds build to the build queue, so is not guarantied 
+that build would be executed immediately.
+
+Parameter `urlParams` - optional parameter, object with params for url, like `{'os_authType': 'basic'}`.
+Parameter `buildParams` - optional parameter for the build, like `{stage: String, executeAllStages: Boolean, customRevision: String}`, 
+please documentation https://docs.atlassian.com/bamboo/REST/5.11.1/#d2e1481.
+
+```javascript
+var urlParams = {"os_authType": "basic"};
+var buildParams = {"executeAllStages": true};
+
+bamboo.buildPlan("PROJECT_KEY-PLAN_KEY", function(error, result) {
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    console.log("Result:", result);
+}, urlParams, buildParams);
+```
+
+#### search(entityToSearch, callback, urlParams)
+
+Performs search on Bamboo's entities.
+In order to provide suitable params, Please follow https://docs.atlassian.com/bamboo/REST/5.11.1/#d2e167
+
+Parameter `entityToSearch` - the entity to search (currently, one of [users, authors, plans, branches, projects, versions])
+Parameter `urlParams` - optional parameter, object with params for url, like `{'os_authType': 'basic'}`. You can provide here 
+search criteria, like:
+
+```json
+{
+    os_authType: "basic"
+    searchTerm: "String"
+    masterPlanKey: "KEY",
+    includeMasterBranch: false
+}
+```
+
+```javascript
+var urlParams = {"os_authType": "basic", "searchTerm": "test version"};
+
+bamboo.buildPlan("branches", function(error, result) {
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    console.log("Result:", result);
+}, urlParams);
+```
+
+
+#### enablePlan(planKey, callback, urlParams)
+
+Method will changes status of a given plan to enabled
+
+Parameter `urlParams` - optional parameter, object with params for url, like `{'os_authType': 'basic'}`.
+
+```javascript
+var urlParams = {"os_authType": "basic"};
+
+bamboo.enablePlan("PROJECT_KEY-PLAN_KEY", function(error, result) {
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    console.log("Plan is enabled!");
+}, urlParams);
+```
+
+#### createBranchPlan(planKey, bambooBranchName, vcsBranchName, callback)
 
 Create branch plan.
 
@@ -204,7 +288,7 @@ Before use you need to define the Bamboo URL in BAMBOO_URL environment variable 
 
 After variable is defined, you can use bamboo-api command line, otherwise on execution you should get following error:
 
-```
+```bash
 $ bamboo-api build_no "PROJECT_KEY-PLAN_KEY"
 
 > ERROR: Before use of Bamboo API command line, specified global variable BAMBOO_URL in your environment!
@@ -225,14 +309,14 @@ $ bamboo-api build_no "PROJECT_KEY-PLAN_KEY"
 
 For command line help use option `--help`:
 
-```
+```bash
 $ bamboo-api --help
 
   Usage: bamboo-api [command] <params...>
 
   Commands:
 
-    build_no <PROJECT_KEY-PLAN_KEY>
+    build_no <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>
     get the latest successful build number
 
     status <PROJECT_KEY-PLAN_KEY>
@@ -253,6 +337,12 @@ $ bamboo-api --help
     plans
     gets the list of all plans available
 
+    buildPlan <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS> <OPTIONAL_BUILD_PARAMS>
+    Execute build plan
+
+    enablePlan <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>
+    Enable build plan
+
   Options:
 
     -h, --help     output usage information
@@ -272,61 +362,59 @@ $ bamboo-api --help
     $ bamboo-api build_status "PROJECT_KEY-PLAN_KEY/BUILD_NUMBER"
     > InProgress
 
-$ bamboo-api build_no --help
-
-  Usage: build_no <PROJECT_KEY-PLAN_KEY>
-
-  Options:
-
-    -h, --help  output usage information
-
 ```
 
-#### bamboo-api build_no
+#### build_no
 
 Get the build number of the latest successful build number:
 
-```
-$ bamboo-api build_no <PROJECT_KEY-PLAN_KEY>
+```bash
+$ bamboo-api build_no <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>
 ```
 
 Will output `result` or `error`.
 
-#### bamboo-api status
+For example:
+
+```bash
+$ bamboo-api build_no "PROJECT_KEY-PLAN_KEY" "{'start-index': 25, 'os_authType': 'basic'}"
+```
+
+#### status
 
 Get status and build number of the latest build:
 
-```
+```bash
 $ bamboo-api status <PROJECT_KEY-PLAN_KEY>
 ```
 
 Will output `state` and `number` otherwise `error`.
 
-#### bamboo-api build_status
+#### build_status
 
 Get the status of the build:
 
-```
+```bash
 $ bamboo-api build_no <PROJECT_KEY-PLAN_KEY/BUILD_NUMBER>
 ```
 
 Will output `result` or `error`.
 
-#### bamboo-api changes
+#### changes
 
 Get all the changes associated to a specific build - considering dependent plan:
 
-```
+```bash
 $ bamboo-api changes <PROJECT_KEY-PLAN_KEY/BUILD_NUMBER>
 ```
 
 Will output `result` or `error`.
 
-#### bamboo-api jira_issue
+#### jira_issue
 
 Get the list of JIRA issues associated to a specific build - considering dependent plan:
 
-```
+```bash
 $ bamboo-api jira_issue <PROJECT_KEY-PLAN_KEY/BUILD_NUMBER>
 ```
 
@@ -337,38 +425,88 @@ Note: For the JIRA integration to work, you need to define the JIRA task in the 
 
 Will output `result` or `error`.
 
-#### bamboo-api artifact
+#### artifact
 
 Get the content of an artifact associated to a specific build:
 
-```
+```bash
 $ bamboo-api artifact <PROJECT_KEY-PLAN_KEY/BUILD_NUMBER> <ARTIFACT_NAME>
 ```
 
 Will output `result` or `error`.
 
-#### bamboo-api plans
+#### plans
 
 Get the list of all the plans available:
 
-```
+```bash
 $ bamboo-api plans
 ```
 
 Will output `result` or `error`.
+
+#### buildPlan
+
+Execute build plan:
+
+```bash
+$ bamboo-api buildPlan <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS> <OPTIONAL_BUILD_PARAMS>
+```
+
+For example:
+
+```bash
+$ bamboo-api buildPlan "PROJECT_KEY-PLAN_KEY" "{'os_authType': 'basic'}" "{'executeAllStages': true}"
+```
+
+#### enablePlan
+
+Enable build plan:
+
+```bash
+$ bamboo-api enablePlan <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>
+```
+
+For example:
+
+```bash
+$ bamboo-api enablePlan "PROJECT_KEY-PLAN_KEY" "{'os_authType': 'basic'}"
+```
+
+#### createBranchPlan
+
+Creates a new branch for a given plan:
+
+```bash
+$ bamboo-api createBranchPlan <PROJECT_KEY-PLAN_KEY> <BAMBOO_BRANCH_NAME> <VCS_BRANCH_NAME>
+```
+
+#### search
+
+Perform search:
+
+```bash
+$ bamboo-api search <ENTITY_TO_SEARCH> <OPTIONAL_URL_PARAMS>
+```
+
+For example:
+
+```bash
+$ bamboo-api search "version" "{'os_authType': 'basic', 'searchTerm': 'test'}"
+```
 
 # Development
 
 This module contains only a limited set of information available with the Bamboo API. Feel free to extend it. Test cases
 are located in the 'test' folder and you run them either through:
 
-```
+```bash
 $ npm test
 ```
 
 or if you have globally installed `mocha`, just use it:
 
-```
+```bash
 $ mocha
 ```
 
