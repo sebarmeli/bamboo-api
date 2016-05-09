@@ -111,6 +111,17 @@ program
             }
         );
     });
+    
+program
+    .command('createBranchPlan <PROJECT_KEY-PLAN_KEY> <BAMBOO_BRANCH_NAME> <VCS_BRANCH_NAME>')
+    .description('creates a new branch for a given plan')
+    .usage('<PROJECT_KEY-PLAN_KEY> <BAMBOO_BRANCH_NAME> <VCS_BRANCH_NAME>')
+    .action(function(planKey, bambooBranchName, vcsBranchName) {
+        return bamboo.createBranchPlan(planKey, bambooBranchName, vcsBranchName, function(error, result) {
+                console.log(">", error ? error.toString() : result);
+            }
+        );
+    });
 
 program
     .command('buildPlan <PROJECT_KEY-PLAN_KEY> <PARAMS>')

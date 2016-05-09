@@ -203,6 +203,57 @@ describe("bamboo.getBuildStatus", function() {
     });
 });
 
+
+describe("bamboo.createBranchPlan", function() {
+    "use strict";
+    
+    var bambooBranchName = "BambooBranchName";
+    var vcsBranchName = "/refs/heads/VCS-Branch";
+    
+    var url = "/rest/api/latest/plan/" + testPlanKey + "/branch/" + bambooBranchName + ".json";
+    
+    it("create a branch plan", function() {
+
+        nock(baseTestUrl)
+            .put(url)
+            .query({"vcsBranch": vcsBranchName})
+            .reply(200, JSON.stringify({
+                "description":"Plan Description",
+                "shortName": bambooBranchName,
+                "shortKey":"TF2",
+                "enabled":true,
+                "link":{
+                    "href":"http://localhost:8085/rest/api/latest/plan/" + testPlanKey + "1",
+                    "rel":"self"
+                },
+                "key": testPlanKey + "1",
+                "name":"Name"
+            }));
+
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.createBranchPlan(testPlanKey, bambooBranchName, vcsBranchName, function(error, result) {
+            should.equal(error, null);
+            should.equal(result, testPlanKey + 1);
+        });
+    });
+    
+    it("create same branch should fail with branch already existed", function () {
+        nock(baseTestUrl)
+            .put(url)
+            .query({"vcsBranch": vcsBranchName})
+            .reply(500, JSON.stringify({
+                "message":"Invalid parameters while trying to create new branch BRANCH-NAME for plan PLAN-NAME. Error: branchName: [This name is already used in a branch or plan.]",
+                "status-code":500
+            }));
+
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.createBranchPlan(testPlanKey, bambooBranchName, vcsBranchName, function(error, result) {
+            error.toString().length.should.be.above(10);
+            should.equal(result, null);
+        });
+    });
+});
+
 describe("bamboo.getLatestBuildStatus", function() {
     "use strict";
 

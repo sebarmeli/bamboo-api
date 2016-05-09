@@ -17,7 +17,7 @@
   "devDependencies": {
     "mocha": "1.20.1",
     "should": "~1.2.1",
-    "nock": "0.42.1"
+    "nock": "8.0.0"
   },
   "directories": {
     "bin": "./bin",

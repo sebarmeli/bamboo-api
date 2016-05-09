@@ -178,6 +178,21 @@ bamboo.getAllPlans("?start-index=25", function(error, result) {
 });
 ```
 
+#### bamboo.createBranchPlan(planKey, bambooBranchName, vcsBranchName, callback)
+
+Create branch plan.
+
+```javascript
+bamboo.createBranchPlan("PROJECT_KEY-PLAN_KEY", "BAMBOO_NAME", "refs/heads/BRANCH_NAME_IN_VCS", function(error, result) {
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    console.log("Result:", result);
+});
+```
+
 ## Command line
 
 The module can be used from command-line and there are few commands available.
