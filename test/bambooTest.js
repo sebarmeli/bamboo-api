@@ -733,6 +733,20 @@ describe("bamboo.enablePlan", function() {
             result.should.equal(responseExpected);
         });
     });
+    
+    it("changes status of a given plan to enabled (204)", function() {
+        var responseExpected = true;
+
+        nock(baseTestUrl)
+            .post(testApiPlanUrl + '/' + testPlanKey + '/766/enable.json')
+            .reply(204);
+
+        var bamboo = new Bamboo(baseTestUrl);
+        bamboo.enablePlan(testPlanKey + '/766', function(error, result) {
+            should.equal(error, null);
+            result.should.equal(responseExpected);
+        });
+    });
 });
 
 describe("bamboo.search", function() {
