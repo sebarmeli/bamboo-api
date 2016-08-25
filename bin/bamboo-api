@@ -119,7 +119,7 @@ program
             }
         );
     });
-    
+
 program
     .command('createBranchPlan <PROJECT_KEY-PLAN_KEY> <BAMBOO_BRANCH_NAME> <VCS_BRANCH_NAME>')
     .description('creates a new branch for a given plan')
@@ -159,11 +159,11 @@ program
     });
 
 program
-    .command('enablePlan <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>')
+    .command('enablePlan <PROJECT_KEY-PLAN_KEY> [OPTIONAL_URL_PARAMS]')
     .description('Enable build plan')
-    .usage('<PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>')
-    .action(function(buildDetails, urlParams) {
-        urlParams = urlParams || {};
+    .usage('<PROJECT_KEY-PLAN_KEY> [OPTIONAL_URL_PARAMS]')
+    .action(function(planKey, urlParams) {
+        urlParams = urlParams || '{}';
 
         try {
             urlParams = JSON.parse(urlParams);
@@ -172,7 +172,7 @@ program
             return;
         }
 
-        return bamboo.buildPlan(buildDetails, function(error, result) {
+        return bamboo.enablePlan(planKey, function(error, result) {
             console.log(">", error ? error.toString() : result);
         }, urlParams);
     });
