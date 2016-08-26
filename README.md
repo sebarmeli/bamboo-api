@@ -364,6 +364,9 @@ $ bamboo-api --help
     enablePlan <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>
     Enable build plan
 
+    disablePlan <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>
+    Disable build plan
+
   Options:
 
     -h, --help     output usage information
@@ -486,6 +489,14 @@ Enable build plan:
 
 ```bash
 $ bamboo-api enablePlan <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>
+```
+
+#### disablePlan
+
+Disable build plan:
+
+```bash
+$ bamboo-api disablePlan <PROJECT_KEY-PLAN_KEY> <OPTIONAL_URL_PARAMS>
 ```
 
 For example:
