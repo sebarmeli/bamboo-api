@@ -262,6 +262,27 @@ bamboo.enablePlan("PROJECT_KEY-PLAN_KEY", function(error, result) {
 }, urlParams);
 ```
 
+
+#### disablePlan(planKey, callback, urlParams)
+
+Method will changes status of a given plan to disabled
+
+Parameter `urlParams` - optional parameter, object with params for url, like `{'os_authType': 'basic'}`.
+
+```javascript
+var urlParams = {"os_authType": "basic"};
+
+bamboo.disablePlan("PROJECT_KEY-PLAN_KEY", function(error, result) {
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    console.log("Plan is disabled!");
+}, urlParams);
+```
+
+
 #### createBranchPlan(planKey, bambooBranchName, vcsBranchName, callback)
 
 Create branch plan.
